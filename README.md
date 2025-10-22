@@ -1,29 +1,241 @@
-# Ruleset recipes
-Starter rulesets are pre-baked to make it easy to get started with [repository rules](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/about-rulesets).
+# Political Social Network Platform
 
-## What is a ruleset?
+A comprehensive social media platform designed specifically for political entities, combining Facebook-like functionality with advanced political data analytics.
 
-A ruleset is a named list of rules that applies to a repository. You can create rulesets to control how people interact with selected branches and tags in a repository. You can control things like who can push commits to a particular branch or who can delete or rename a tag. For example, you could set up a ruleset for your repository's feature branch that requires signed commits and blocks force pushes for all users except repository administrators.
+## 🏛️ Overview
 
-## Get cooking
-1. Grab a copy of this repo
- - ⬆️ top click `< > Code`
- - Pick your favorite way to clone, like [GitHub CLI](https://cli.github.com/), or download the ZIP.    
-2. To get started, visit your favorite repository or organization you have admin access to.
- - Head to ⚙️Settings > Rules > Rulesets
- - Select New Ruleset > Import a ruleset
- - Browse to your local clone of the ruleset-recipes you want to import
- - Review the imported ruleset and save your changes!
- - Success! 🎉
+This platform creates detailed profiles for political entities using data from:
+- **api.congress.gov** - Congressional data and voting records
+- **govinfo.gov/api** - Government information and bulk data
+- **openstates.org** - State-level political data
 
-### Video Example
-![Gif walking through the steps outline above to import a ruleset from a JSON file.](https://github.com/github/release-assets/assets/7575792/8806fa8c-b874-4a4e-97ef-4f8c238f4d29)
+## ✨ Key Features
 
-# Table of contents
-## Branch Rulesets
-- [Branch protection best practices](https://github.com/github/ruleset-recipes/blob/a1f8e53ec12857637e8762e689a3abc255ff2c2f/branch-rulesets/were-just-normal-repositories.json)
-- [Require Pull Requests and conventional commits](https://github.com/github/ruleset-recipes/blob/8cd19a8e06e6e523fffd43e4a59a554c210dcbe2/branch-rulesets/PRs%20and%20commits.json)
-- [Organization ruleset: One Rule to rule them all](https://github.com/github/ruleset-recipes/blob/8cd19a8e06e6e523fffd43e4a59a554c210dcbe2/branch-rulesets/org-rulesets/one-ruleset-to-rule-them-all.json)
-## Tag Rulesets
-- [Prevent Tag Deletions](https://github.com/github/ruleset-recipes/blob/a1f8e53ec12857637e8762e689a3abc255ff2c2f/tag-rulesets/prevent-tag-delete.json)
-- [Organization ruleset: requiring semantic versioning and prevents deletion for all tags](https://github.com/github/ruleset-recipes/blob/ac4b5ebc05219bb07de10f6094ad9ae8215bd39c/tag-rulesets/org-ruleset/tag-defaults.json)
+### Social Media Functionality
+- 📱 Mobile-responsive Facebook-like interface
+- 👥 User profiles and politician profiles
+- 📝 Posts, comments, likes, and shares
+- 🔔 Real-time notifications
+- 📰 Personalized news feeds
+
+### Political Analytics
+- 🗳️ Voting record analysis and visualization
+- 📊 Bill summaries using NLP processing
+- 🔍 Cosine similarity calculations between politicians
+- 📈 KPIs and statistical measures
+- 🏷️ Automated bill categorization and binning
+
+### Data Integration
+- 🔄 Automated data ingestion from government APIs
+- 📋 Comprehensive political entity profiles
+- 🗂️ Membership and committee data
+- 📜 Legislative history tracking
+
+## 🛠️ Technology Stack
+
+### Frontend
+- **Next.js 14** with TypeScript
+- **Tailwind CSS** for styling
+- **React Query** for data fetching
+- **Chart.js/D3.js** for data visualization
+- **PWA** capabilities for mobile experience
+
+### Backend
+- **Node.js** with Express.js
+- **TypeScript** for type safety
+- **PostgreSQL** for primary database
+- **Redis** for caching and sessions
+- **Bull Queue** for background jobs
+
+### Analytics & NLP
+- **Natural Language Processing** for bill analysis
+- **Cosine similarity** algorithms
+- **Text summarization** and categorization
+- **Statistical analysis** and KPI generation
+
+### Infrastructure
+- **Docker** containerization
+- **GitHub Actions** CI/CD
+- **AWS/Vercel** deployment
+- **Monitoring** and logging
+
+## 📁 Project Structure
+
+```
+├── frontend/                 # Next.js React application
+│   ├── src/
+│   │   ├── components/      # Reusable UI components
+│   │   ├── pages/          # Next.js pages
+│   │   ├── hooks/          # Custom React hooks
+│   │   ├── styles/         # CSS and styling
+│   │   └── utils/          # Utility functions
+│   └── package.json
+├── backend/                 # Express.js API server
+│   ├── src/
+│   │   ├── routes/         # API route handlers
+│   │   ├── controllers/    # Business logic
+│   │   ├── services/       # External service integrations
+│   │   ├── models/         # Database models
+│   │   ├── middleware/     # Express middleware
+│   │   ├── jobs/           # Background job processors
+│   │   ├── analytics/      # Analytics and NLP processing
+│   │   └── database/       # Database migrations and seeds
+│   └── package.json
+├── shared/                  # Shared types and utilities
+├── docs/                   # Documentation
+├── docker-compose.yml      # Development environment
+└── package.json           # Root package.json
+```
+
+## 🚀 Quick Start
+
+### Prerequisites
+- Node.js 18+
+- PostgreSQL 14+
+- Redis 6+
+- Docker (optional)
+
+### Installation
+
+1. **Clone the repository**
+   ```bash
+   git clone <repository-url>
+   cd political-social-network
+   ```
+
+2. **Install dependencies**
+   ```bash
+   npm install
+   cd frontend && npm install
+   cd ../backend && npm install
+   ```
+
+3. **Set up environment variables**
+   ```bash
+   cp .env.example .env
+   # Edit .env with your configuration
+   ```
+
+4. **Start the database**
+   ```bash
+   docker-compose up -d postgres redis
+   ```
+
+5. **Run database migrations**
+   ```bash
+   cd backend
+   npm run migrate
+   npm run seed
+   ```
+
+6. **Start the development servers**
+   ```bash
+   # Terminal 1 - Backend
+   cd backend && npm run dev
+
+   # Terminal 2 - Frontend
+   cd frontend && npm run dev
+   ```
+
+7. **Open your browser**
+   - Frontend: http://localhost:3000
+   - Backend API: http://localhost:8000
+
+## 📊 Data Sources
+
+### Congress.gov API
+- Bills and resolutions
+- Voting records
+- Committee information
+- Member data
+
+### GovInfo.gov API
+- Federal Register documents
+- Congressional documents
+- Bulk data downloads
+
+### OpenStates API
+- State legislature data
+- State bills and votes
+- State legislator information
+
+## 🔧 Development
+
+### Running Tests
+```bash
+npm test                    # Run all tests
+npm run test:frontend      # Frontend tests only
+npm run test:backend       # Backend tests only
+```
+
+### Database Operations
+```bash
+npm run migrate            # Run migrations
+npm run migrate:rollback   # Rollback migrations
+npm run seed              # Seed database
+```
+
+### Background Jobs
+```bash
+npm run jobs:start        # Start job processors
+npm run jobs:dashboard    # View job dashboard
+```
+
+## 📈 Analytics Features
+
+### NLP Processing
+- **Bill Summarization**: Automatic extraction of key points from legislation
+- **Topic Classification**: Categorization of bills by policy area
+- **Sentiment Analysis**: Analysis of political statements and positions
+
+### Similarity Calculations
+- **Voting Pattern Analysis**: Compare politicians based on voting history
+- **Policy Position Similarity**: Cosine similarity on policy stances
+- **Coalition Detection**: Identify political alliances and opposition
+
+### KPIs and Metrics
+- **Participation Rates**: Voting attendance and engagement
+- **Bipartisan Index**: Measure of cross-party collaboration
+- **Influence Scores**: Impact and leadership metrics
+- **Consistency Ratings**: Alignment with stated positions
+
+## 🔐 Security
+
+- JWT-based authentication
+- Rate limiting on API endpoints
+- Input validation and sanitization
+- SQL injection prevention
+- XSS protection
+- CORS configuration
+
+## 📱 Mobile Optimization
+
+- Responsive design for all screen sizes
+- Touch-friendly interface elements
+- Optimized loading for mobile networks
+- Progressive Web App (PWA) features
+- Offline capability for core features
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests for new functionality
+5. Submit a pull request
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🆘 Support
+
+For questions and support:
+- Create an issue on GitHub
+- Check the documentation in `/docs`
+- Review the API documentation at `/api/docs`
+
+---
+
+**Built with ❤️ for political transparency and civic engagement**
+
