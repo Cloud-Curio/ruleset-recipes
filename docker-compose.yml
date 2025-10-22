@@ -1,0 +1,128 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: political-db
+    environment:
+      POSTGRES_DB: political_social_network
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./backend/src/database/init:/docker-entrypoint-initdb.d
+    networks:
+      - political-network
+
+  # Redis Cache
+  redis:
+    image: redis:7-alpine
+    container_name: political-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - political-network
+
+  # Backend API
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: political-backend
+    environment:
+      NODE_ENV: development
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/political_social_network
+      REDIS_URL: redis://redis:6379
+      JWT_SECRET: your-jwt-secret-key
+      CONGRESS_API_KEY: ${CONGRESS_API_KEY}
+      GOVINFO_API_KEY: ${GOVINFO_API_KEY}
+      OPENSTATES_API_KEY: ${OPENSTATES_API_KEY}
+    ports:
+      - "8000:8000"
+    depends_on:
+      - postgres
+      - redis
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    networks:
+      - political-network
+    command: npm run dev
+
+  # Frontend Application
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: political-frontend
+    environment:
+      NEXT_PUBLIC_API_URL: http://localhost:8000
+      NODE_ENV: development
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+      - /app/.next
+    networks:
+      - political-network
+    command: npm run dev
+
+  # Background Job Processor
+  jobs:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: political-jobs
+    environment:
+      NODE_ENV: development
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/political_social_network
+      REDIS_URL: redis://redis:6379
+      CONGRESS_API_KEY: ${CONGRESS_API_KEY}
+      GOVINFO_API_KEY: ${GOVINFO_API_KEY}
+      OPENSTATES_API_KEY: ${OPENSTATES_API_KEY}
+    depends_on:
+      - postgres
+      - redis
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    networks:
+      - political-network
+    command: npm run jobs:start
+
+  # Job Dashboard (Bull Board)
+  jobs-dashboard:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: political-jobs-dashboard
+    environment:
+      NODE_ENV: development
+      REDIS_URL: redis://redis:6379
+    ports:
+      - "3001:3001"
+    depends_on:
+      - redis
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    networks:
+      - political-network
+    command: npm run jobs:dashboard
+
+volumes:
+  postgres_data:
+  redis_data:
+
+networks:
+  political-network:
+    driver: bridge
+
