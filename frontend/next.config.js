@@ -9,9 +9,6 @@ const withPWA = require('next-pwa')({
 const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
-  experimental: {
-    appDir: true,
-  },
   images: {
     domains: [
       'localhost',
@@ -19,6 +16,8 @@ const nextConfig = {
       'www.govinfo.gov',
       'openstates.org',
       'bioguide.congress.gov',
+      'picsum.photos',
+      'api.dicebear.com',
     ],
     formats: ['image/webp', 'image/avif'],
   },
@@ -28,10 +27,11 @@ const nextConfig = {
     NEXT_PUBLIC_APP_VERSION: process.env.npm_package_version,
   },
   async rewrites() {
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
     return [
       {
         source: '/api/:path*',
-        destination: `${process.env.NEXT_PUBLIC_API_URL}/api/:path*`,
+        destination: `${apiUrl}/api/:path*`,
       },
     ];
   },
