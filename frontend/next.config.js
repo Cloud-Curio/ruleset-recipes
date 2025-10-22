@@ -9,10 +9,11 @@ const withPWA = require('next-pwa')({
 const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
-  experimental: {
-    appDir: true,
-  },
+  output: 'export', // Enable static export for portability
+  distDir: 'out', // Output directory for static export
+  trailingSlash: true, // Required for static export
   images: {
+    unoptimized: true, // Required for static export
     domains: [
       'localhost',
       'api.congress.gov',
@@ -23,17 +24,9 @@ const nextConfig = {
     formats: ['image/webp', 'image/avif'],
   },
   env: {
-    NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000',
+    NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL || '/api',
     NEXT_PUBLIC_APP_NAME: 'Political Social Network',
     NEXT_PUBLIC_APP_VERSION: process.env.npm_package_version,
-  },
-  async rewrites() {
-    return [
-      {
-        source: '/api/:path*',
-        destination: `${process.env.NEXT_PUBLIC_API_URL}/api/:path*`,
-      },
-    ];
   },
   async headers() {
     return [
