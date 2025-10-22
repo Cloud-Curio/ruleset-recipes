@@ -1,11 +1,10 @@
 import Redis from 'ioredis';
 
-let redisClient: Redis;
+let redisClient: Redis | undefined;
 
 export async function initializeRedis(): Promise<Redis> {
   try {
-    redisClient = new Redis(process.env.REDIS_URL || 'redis://localhost:6379', {
-      retryDelayOnFailover: 100,
+    redisClient = new Redis(process.env['REDIS_URL'] || 'redis://localhost:6379', {
       enableReadyCheck: false,
       maxRetriesPerRequest: null,
     });

@@ -91,8 +91,8 @@ This platform creates detailed profiles for political entities using data from:
 
 ### Prerequisites
 - Node.js 18+
-- PostgreSQL 14+
-- Redis 6+
+- PostgreSQL 14+ (optional for full features)
+- Redis 6+ (optional for caching)
 - Docker (optional)
 
 ### Installation
@@ -103,43 +103,80 @@ This platform creates detailed profiles for political entities using data from:
    cd political-social-network
    ```
 
-2. **Install dependencies**
+2. **Quick Start (Recommended)**
    ```bash
+   ./start.sh
+   ```
+   
+   This script will:
+   - Install all dependencies
+   - Build the entire project
+   - Start the unified server
+   
+   Access the application at http://localhost:8000
+
+3. **Manual Setup**
+   ```bash
+   # Install dependencies
    npm install
-   cd frontend && npm install
-   cd ../backend && npm install
+   
+   # Build the project
+   npm run build
+   
+   # Start the server
+   cd backend && npm start
    ```
 
-3. **Set up environment variables**
+4. **Set up environment variables (optional)**
    ```bash
    cp .env.example .env
    # Edit .env with your configuration
    ```
 
-4. **Start the database**
-   ```bash
-   docker-compose up -d postgres redis
-   ```
+### Running the Application
 
-5. **Run database migrations**
-   ```bash
-   cd backend
-   npm run migrate
-   npm run seed
-   ```
+#### Option 1: Unified Server (Backend serves Frontend)
 
-6. **Start the development servers**
-   ```bash
-   # Terminal 1 - Backend
-   cd backend && npm run dev
+The simplest way to run the application:
 
-   # Terminal 2 - Frontend
-   cd frontend && npm run dev
-   ```
+```bash
+cd backend
+npm start
+```
 
-7. **Open your browser**
-   - Frontend: http://localhost:3000
-   - Backend API: http://localhost:8000
+- **Frontend**: http://localhost:8000
+- **API**: http://localhost:8000/api
+- **API Docs**: http://localhost:8000/api/docs
+- **Health Check**: http://localhost:8000/health
+
+#### Option 2: Separate Development Servers
+
+For development with hot-reload:
+
+```bash
+# Terminal 1 - Backend
+cd backend && npm run dev
+
+# Terminal 2 - Frontend
+cd frontend && npm run dev
+```
+
+- **Frontend**: http://localhost:3000
+- **Backend API**: http://localhost:8000
+
+#### Option 3: Docker Compose
+
+For full stack with database:
+
+```bash
+docker-compose up -d
+```
+
+This starts:
+- Frontend (port 3000)
+- Backend (port 8000)
+- PostgreSQL (port 5432)
+- Redis (port 6379)
 
 ## 📊 Data Sources
 
@@ -158,6 +195,13 @@ This platform creates detailed profiles for political entities using data from:
 - State legislature data
 - State bills and votes
 - State legislator information
+
+## 📖 Documentation
+
+- **[API Documentation](docs/API.md)** - Complete API reference and examples
+- **[Deployment Guide](docs/DEPLOYMENT.md)** - Deployment options and configurations  
+- **[Security Guide](docs/SECURITY.md)** - Security best practices and features
+- **[Swagger UI](http://localhost:8000/api/docs)** - Interactive API documentation (when server is running)
 
 ## 🔧 Development
 
@@ -201,12 +245,18 @@ npm run jobs:dashboard    # View job dashboard
 
 ## 🔐 Security
 
-- JWT-based authentication
-- Rate limiting on API endpoints
-- Input validation and sanitization
-- SQL injection prevention
-- XSS protection
-- CORS configuration
+The platform implements comprehensive security measures:
+
+- **JWT-based authentication** with secure token management
+- **Rate limiting** to prevent abuse (100 requests per 15 minutes per IP)
+- **Helmet.js** for security headers (CSP, XSS protection, etc.)
+- **Input validation and sanitization** on all endpoints
+- **CORS configuration** to control cross-origin requests
+- **SQL injection prevention** through parameterized queries
+- **XSS protection** via content security policy
+- **OpenAPI/Swagger documentation** for API transparency
+
+For detailed security information, see [SECURITY.md](docs/SECURITY.md)
 
 ## 📱 Mobile Optimization
 
@@ -231,9 +281,12 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## 🆘 Support
 
 For questions and support:
+- Review the [API Documentation](docs/API.md)
+- Check the [Deployment Guide](docs/DEPLOYMENT.md)
+- Read the [Security Guide](docs/SECURITY.md)
+- Visit the [Swagger API Docs](http://localhost:8000/api/docs) (when running)
 - Create an issue on GitHub
 - Check the documentation in `/docs`
-- Review the API documentation at `/api/docs`
 
 ---
 

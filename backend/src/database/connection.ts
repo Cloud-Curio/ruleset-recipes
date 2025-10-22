@@ -1,7 +1,8 @@
 import knex, { Knex } from 'knex';
-import knexConfig from '../../knexfile';
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const knexConfig = require('../../knexfile');
 
-const environment = process.env.NODE_ENV || 'development';
+const environment = process.env['NODE_ENV'] || 'development';
 const config = knexConfig[environment as keyof typeof knexConfig];
 
 // Create database connection
@@ -14,7 +15,7 @@ export async function initializeDatabase(): Promise<void> {
     await db.raw('SELECT 1');
     
     // Run migrations in production/staging
-    if (process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'staging') {
+    if (process.env['NODE_ENV'] === 'production' || process.env['NODE_ENV'] === 'staging') {
       await db.migrate.latest();
       console.log('✅ Database migrations completed');
     }
