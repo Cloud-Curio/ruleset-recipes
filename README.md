@@ -103,20 +103,34 @@ This platform creates detailed profiles for political entities using data from:
    cd political-social-network
    ```
 
-2. **Install dependencies**
+2. **Quick Start (Recommended)**
    ```bash
+   ./start.sh
+   ```
+   
+   This script will:
+   - Install all dependencies
+   - Build the entire project
+   - Start the unified server
+   
+   Access the application at http://localhost:8000
+
+3. **Manual Setup**
+   ```bash
+   # Install dependencies
    npm install
+   
+   # Build the project
+   npm run build
+   
+   # Start the server
+   cd backend && npm start
    ```
 
-3. **Set up environment variables**
+4. **Set up environment variables (optional)**
    ```bash
    cp .env.example .env
    # Edit .env with your configuration
-   ```
-
-4. **Build the project**
-   ```bash
-   npm run build
    ```
 
 ### Running the Application
