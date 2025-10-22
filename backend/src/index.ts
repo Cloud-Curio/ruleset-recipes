@@ -60,7 +60,7 @@ app.use(cors({
 }));
 
 // Rate limiting
-const limiter = rateLimit({
+const apiLimiter = rateLimit({
   windowMs: parseInt(process.env['RATE_LIMIT_WINDOW_MS'] || '900000'), // 15 minutes
   max: parseInt(process.env['RATE_LIMIT_MAX_REQUESTS'] || '100'),
   message: {
@@ -69,7 +69,22 @@ const limiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
 });
-app.use('/api/', limiter);
+app.use('/api/', apiLimiter);
+
+// Rate limiting for static file serving (more lenient)
+const staticLimiter = rateLimit({
+  windowMs: parseInt(process.env['RATE_LIMIT_WINDOW_MS'] || '900000'), // 15 minutes
+  max: parseInt(process.env['RATE_LIMIT_MAX_REQUESTS'] || '500'), // Higher limit for static files
+  message: {
+    error: 'Too many requests from this IP, please try again later.',
+  },
+  standardHeaders: true,
+  legacyHeaders: false,
+  skip: (req) => {
+    // Skip rate limiting for API routes (handled by apiLimiter)
+    return req.path.startsWith('/api') || req.path.startsWith('/health');
+  },
+});
 
 // Body parsing middleware
 app.use(express.json({ limit: '10mb' }));
@@ -136,6 +151,9 @@ app.get('/api', (_req, res) => {
 // Serve static frontend files (production)
 const frontendDistPath = path.join(__dirname, '../../frontend/out');
 const frontendPublicPath = path.join(__dirname, '../../frontend/public');
+
+// Apply rate limiting to static file serving
+app.use(staticLimiter);
 
 // Serve static assets from frontend build
 app.use(express.static(frontendDistPath));
