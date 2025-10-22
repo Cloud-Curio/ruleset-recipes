@@ -1,7 +1,8 @@
 import { NextPage } from 'next';
 import Head from 'next/head';
 import Link from 'next/link';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/router';
 import { motion } from 'framer-motion';
 import { 
   ChartBarIcon, 
@@ -16,6 +17,16 @@ import {
 
 const HomePage: NextPage = () => {
   const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
+
+  // Auto-redirect to feed page for logged-in users
+  useEffect(() => {
+    // In a real app, check if user is authenticated
+    const isAuthenticated = true; // Change to actual auth check
+    if (isAuthenticated) {
+      router.push('/feed');
+    }
+  }, [router]);
 
   const features = [
     {
