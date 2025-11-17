@@ -1,0 +1,352 @@
+# Data Ingestion TUI - API Endpoints Configuration
+# 
+# This file defines the configuration for various government and public APIs
+# that the application can ingest data from.
+# 
+# Author: Codegen AI Assistant
+# Created: 2024
+# License: MIT
+
+# Government APIs
+congress_gov:
+  base_url: "https://api.congress.gov/v3"
+  description: "Congress.gov API for legislative data"
+  enabled: true
+  rate_limit: 5000  # requests per hour
+  timeout: 30s
+  headers:
+    User-Agent: "DataIngestionTUI/1.0"
+  endpoints:
+    bills: "/bill"
+    members: "/member"
+    committees: "/committee"
+    nominations: "/nomination"
+    treaties: "/treaty"
+  documentation: "https://api.congress.gov/"
+  authentication:
+    type: "api_key"
+    header: "X-API-Key"
+    required: true
+
+govinfo_gov:
+  base_url: "https://api.govinfo.gov"
+  description: "GovInfo.gov API for government publications"
+  enabled: true
+  rate_limit: 1000  # requests per hour
+  timeout: 45s
+  headers:
+    User-Agent: "DataIngestionTUI/1.0"
+  endpoints:
+    collections: "/collections"
+    packages: "/packages"
+    published: "/published"
+  documentation: "https://api.govinfo.gov/docs/"
+  authentication:
+    type: "api_key"
+    header: "X-API-Key"
+    required: true
+
+openstates_org:
+  base_url: "https://v3.openstates.org/api/v3"
+  description: "OpenStates.org API for state legislative data"
+  enabled: true
+  rate_limit: 2000  # requests per hour
+  timeout: 30s
+  headers:
+    User-Agent: "DataIngestionTUI/1.0"
+  endpoints:
+    jurisdictions: "/jurisdictions"
+    people: "/people"
+    bills: "/bills"
+    votes: "/votes"
+    events: "/events"
+  documentation: "https://docs.openstates.org/api-v3/"
+  authentication:
+    type: "api_key"
+    header: "X-API-Key"
+    required: true
+
+# Economic Data APIs
+fred_stlouisfed:
+  base_url: "https://api.stlouisfed.org/fred"
+  description: "Federal Reserve Economic Data (FRED) API"
+  enabled: true
+  rate_limit: 120  # requests per minute
+  timeout: 30s
+  headers:
+    User-Agent: "DataIngestionTUI/1.0"
+  endpoints:
+    series: "/series"
+    observations: "/series/observations"
+    categories: "/category"
+    sources: "/sources"
+    releases: "/releases"
+  documentation: "https://fred.stlouisfed.org/docs/api/fred/"
+  authentication:
+    type: "api_key"
+    parameter: "api_key"
+    required: true
+
+census_gov:
+  base_url: "https://api.census.gov/data"
+  description: "U.S. Census Bureau API"
+  enabled: true
+  rate_limit: 500  # requests per day
+  timeout: 60s
+  headers:
+    User-Agent: "DataIngestionTUI/1.0"
+  endpoints:
+    acs: "/2021/acs/acs5"  # American Community Survey
+    decennial: "/2020/dec/sf1"  # Decennial Census
+    economic: "/2017/ecnbasic"  # Economic Census
+    population: "/2021/pep/population"  # Population Estimates
+  documentation: "https://www.census.gov/data/developers/data-sets.html"
+  authentication:
+    type: "api_key"
+    parameter: "key"
+    required: false
+
+# Financial Data APIs
+sec_gov:
+  base_url: "https://data.sec.gov"
+  description: "SEC EDGAR API for financial filings"
+  enabled: true
+  rate_limit: 10  # requests per second
+  timeout: 30s
+  headers:
+    User-Agent: "DataIngestionTUI/1.0 (your-email@example.com)"  # SEC requires contact info
+  endpoints:
+    company_facts: "/api/xbrl/companyfacts"
+    submissions: "/api/xbrl/submissions"
+    frames: "/api/xbrl/frames"
+  documentation: "https://www.sec.gov/edgar/sec-api-documentation"
+  authentication:
+    type: "none"
+    required: false
+  notes:
+    - "SEC requires User-Agent header with contact information"
+    - "Rate limiting is strictly enforced"
+    - "Be respectful of their resources"
+
+fec_gov:
+  base_url: "https://api.open.fec.gov/v1"
+  description: "Federal Election Commission API"
+  enabled: true
+  rate_limit: 1000  # requests per hour
+  timeout: 30s
+  headers:
+    User-Agent: "DataIngestionTUI/1.0"
+  endpoints:
+    candidates: "/candidates"
+    committees: "/committees"
+    filings: "/filings"
+    receipts: "/schedules/schedule_a"
+    disbursements: "/schedules/schedule_b"
+  documentation: "https://api.open.fec.gov/developers/"
+  authentication:
+    type: "api_key"
+    header: "X-API-Key"
+    required: true
+
+# Crime and Security Data APIs
+fbi_crime_data:
+  base_url: "https://api.usa.gov/crime/fbi/sapi"
+  description: "FBI Crime Data API"
+  enabled: true
+  rate_limit: 1000  # requests per hour
+  timeout: 30s
+  headers:
+    User-Agent: "DataIngestionTUI/1.0"
+  endpoints:
+    agencies: "/api/agencies"
+    participation: "/api/participation"
+    estimates: "/api/estimates"
+    incidents: "/api/incidents"
+  documentation: "https://crime-data-explorer.fr.cloud.gov/pages/api"
+  authentication:
+    type: "api_key"
+    parameter: "api_key"
+    required: true
+
+# Housing Data APIs
+hud_gov:
+  base_url: "https://www.huduser.gov/hudapi/public"
+  description: "HUD (Housing and Urban Development) API"
+  enabled: true
+  rate_limit: 1200  # requests per hour
+  timeout: 45s
+  headers:
+    User-Agent: "DataIngestionTUI/1.0"
+  endpoints:
+    fmr: "/fmr"  # Fair Market Rents
+    il: "/il"    # Income Limits
+    lihtc: "/lihtc"  # Low-Income Housing Tax Credit
+  documentation: "https://www.huduser.gov/portal/dataset/api.html"
+  authentication:
+    type: "api_key"
+    header: "Authorization"
+    required: true
+
+# Stock Market APIs (Free Tier)
+alpha_vantage:
+  base_url: "https://www.alphavantage.co/query"
+  description: "Alpha Vantage Stock Market API (Free Tier)"
+  enabled: true
+  rate_limit: 5  # requests per minute (free tier)
+  timeout: 30s
+  headers:
+    User-Agent: "DataIngestionTUI/1.0"
+  endpoints:
+    time_series_daily: "?function=TIME_SERIES_DAILY"
+    time_series_intraday: "?function=TIME_SERIES_INTRADAY"
+    global_quote: "?function=GLOBAL_QUOTE"
+    search: "?function=SYMBOL_SEARCH"
+  documentation: "https://www.alphavantage.co/documentation/"
+  authentication:
+    type: "api_key"
+    parameter: "apikey"
+    required: true
+  notes:
+    - "Free tier limited to 5 requests per minute"
+    - "Premium plans available for higher limits"
+
+polygon_io:
+  base_url: "https://api.polygon.io"
+  description: "Polygon.io Stock Market API (Free Tier)"
+  enabled: true
+  rate_limit: 5  # requests per minute (free tier)
+  timeout: 30s
+  headers:
+    User-Agent: "DataIngestionTUI/1.0"
+  endpoints:
+    stocks_trades: "/v3/trades"
+    stocks_quotes: "/v3/quotes"
+    aggregates: "/v2/aggs"
+    tickers: "/v3/reference/tickers"
+  documentation: "https://polygon.io/docs/stocks/getting-started"
+  authentication:
+    type: "api_key"
+    parameter: "apikey"
+    required: true
+
+# Additional APIs
+bls_gov:
+  base_url: "https://api.bls.gov/publicAPI/v2"
+  description: "Bureau of Labor Statistics API"
+  enabled: true
+  rate_limit: 25  # requests per day (unregistered)
+  timeout: 30s
+  headers:
+    User-Agent: "DataIngestionTUI/1.0"
+  endpoints:
+    timeseries: "/timeseries/data"
+    surveys: "/surveys"
+  documentation: "https://www.bls.gov/developers/api_signature_v2.htm"
+  authentication:
+    type: "api_key"
+    parameter: "registrationkey"
+    required: false  # Optional, increases rate limits
+
+epa_gov:
+  base_url: "https://aqs.epa.gov/data/api"
+  description: "EPA Air Quality System API"
+  enabled: true
+  rate_limit: 1000  # requests per hour
+  timeout: 30s
+  headers:
+    User-Agent: "DataIngestionTUI/1.0"
+  endpoints:
+    monitors: "/monitors"
+    sampleData: "/sampleData"
+    dailyData: "/dailyData"
+    annualData: "/annualData"
+  documentation: "https://aqs.epa.gov/aqsweb/documents/data_api.html"
+  authentication:
+    type: "basic"
+    required: true
+  notes:
+    - "Requires email and key registration"
+    - "Free for non-commercial use"
+
+# Configuration for ingestion schedules
+ingestion_schedules:
+  congress_bills:
+    endpoint: "congress_gov"
+    path: "/bill"
+    schedule: "0 6 * * *"  # Daily at 6 AM
+    enabled: true
+    parameters:
+      format: "json"
+      limit: 250
+    
+  fred_gdp:
+    endpoint: "fred_stlouisfed"
+    path: "/series/observations"
+    schedule: "0 8 * * 1"  # Weekly on Monday at 8 AM
+    enabled: true
+    parameters:
+      series_id: "GDP"
+      file_type: "json"
+    
+  sec_filings:
+    endpoint: "sec_gov"
+    path: "/api/xbrl/submissions"
+    schedule: "0 20 * * *"  # Daily at 8 PM
+    enabled: true
+    parameters:
+      format: "json"
+    
+  census_population:
+    endpoint: "census_gov"
+    path: "/2021/pep/population"
+    schedule: "0 2 1 * *"  # Monthly on 1st at 2 AM
+    enabled: true
+    parameters:
+      get: "POP"
+      for: "state:*"
+
+# Data quality rules
+data_quality:
+  validation_rules:
+    - name: "required_fields"
+      description: "Ensure required fields are present"
+      enabled: true
+    - name: "data_types"
+      description: "Validate data types"
+      enabled: true
+    - name: "date_formats"
+      description: "Standardize date formats"
+      enabled: true
+    - name: "duplicate_detection"
+      description: "Detect and handle duplicates"
+      enabled: true
+  
+  transformation_rules:
+    - name: "normalize_names"
+      description: "Normalize person and organization names"
+      enabled: true
+    - name: "standardize_addresses"
+      description: "Standardize address formats"
+      enabled: true
+    - name: "currency_conversion"
+      description: "Convert currencies to USD"
+      enabled: false
+
+# Notification settings
+notifications:
+  email:
+    enabled: false
+    smtp_server: ""
+    smtp_port: 587
+    username: ""
+    recipients: []
+  
+  webhook:
+    enabled: false
+    url: ""
+    events: ["ingestion_complete", "ingestion_failed", "data_quality_issues"]
+  
+  slack:
+    enabled: false
+    webhook_url: ""
+    channel: "#data-ingestion"
