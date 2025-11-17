@@ -1,0 +1,182 @@
+# Data Ingestion TUI - Test Environment Docker Compose
+# 
+# This Docker Compose file sets up a complete test environment with:
+# - PostgreSQL database with test data
+# - Prometheus for metrics collection
+# - Grafana for metrics visualization
+# - Jaeger for distributed tracing
+# 
+# Author: Codegen AI Assistant
+# Created: 2024
+# License: MIT
+
+version: '3.8'
+
+services:
+  # PostgreSQL database for testing
+  postgres:
+    image: postgres:16-alpine
+    container_name: dit-postgres-test
+    environment:
+      POSTGRES_DB: dit_test
+      POSTGRES_USER: dit_test
+      POSTGRES_PASSWORD: test_password
+      POSTGRES_INITDB_ARGS: "--encoding=UTF8 --locale=C"
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_test_data:/var/lib/postgresql/data
+      - ./migrations/postgresql:/docker-entrypoint-initdb.d
+      - ./tests/fixtures/test_data.sql:/docker-entrypoint-initdb.d/99_test_data.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U dit_test -d dit_test"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - dit-test-network
+
+  # Prometheus for metrics collection
+  prometheus:
+    image: prom/prometheus:v2.47.0
+    container_name: dit-prometheus-test
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./tests/config/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_test_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--storage.tsdb.retention.time=1h'
+      - '--web.enable-lifecycle'
+    networks:
+      - dit-test-network
+
+  # Grafana for metrics visualization
+  grafana:
+    image: grafana/grafana:10.1.0
+    container_name: dit-grafana-test
+    ports:
+      - "3000:3000"
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: admin
+      GF_USERS_ALLOW_SIGN_UP: false
+      GF_INSTALL_PLUGINS: grafana-piechart-panel
+    volumes:
+      - grafana_test_data:/var/lib/grafana
+      - ./tests/config/grafana/provisioning:/etc/grafana/provisioning
+      - ./tests/config/grafana/dashboards:/var/lib/grafana/dashboards
+    depends_on:
+      - prometheus
+    networks:
+      - dit-test-network
+
+  # Jaeger for distributed tracing
+  jaeger:
+    image: jaegertracing/all-in-one:1.49
+    container_name: dit-jaeger-test
+    ports:
+      - "16686:16686"  # Jaeger UI
+      - "14268:14268"  # Jaeger collector HTTP
+      - "14250:14250"  # Jaeger collector gRPC
+    environment:
+      COLLECTOR_OTLP_ENABLED: true
+      COLLECTOR_ZIPKIN_HOST_PORT: ":9411"
+    networks:
+      - dit-test-network
+
+  # Redis for caching (optional)
+  redis:
+    image: redis:7-alpine
+    container_name: dit-redis-test
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_test_data:/data
+    command: redis-server --appendonly yes
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+    networks:
+      - dit-test-network
+
+  # Test runner container
+  test-runner:
+    build:
+      context: .
+      dockerfile: Dockerfile.test
+    container_name: dit-test-runner
+    environment:
+      # Database configuration
+      DATABASE_URL: "postgresql://dit_test:test_password@postgres:5432/dit_test?sslmode=disable"
+      
+      # Telemetry configuration
+      PROMETHEUS_URL: "http://prometheus:9090"
+      JAEGER_ENDPOINT: "http://jaeger:14268/api/traces"
+      
+      # Redis configuration
+      REDIS_URL: "redis://redis:6379"
+      
+      # Test configuration
+      TEST_ENV: "docker"
+      LOG_LEVEL: "info"
+      
+      # API endpoints for testing
+      CONGRESS_API_KEY: "${CONGRESS_API_KEY:-test_key}"
+      FRED_API_KEY: "${FRED_API_KEY:-test_key}"
+      
+    volumes:
+      - .:/app
+      - /app/vendor  # Exclude vendor directory
+    working_dir: /app
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      prometheus:
+        condition: service_started
+      jaeger:
+        condition: service_started
+    networks:
+      - dit-test-network
+    profiles:
+      - test
+
+  # Load testing with k6
+  k6:
+    image: grafana/k6:0.46.0
+    container_name: dit-k6-test
+    volumes:
+      - ./tests/load:/scripts
+    environment:
+      K6_PROMETHEUS_RW_SERVER_URL: http://prometheus:9090/api/v1/write
+      K6_PROMETHEUS_RW_TREND_AS_NATIVE_HISTOGRAM: true
+    depends_on:
+      - prometheus
+    networks:
+      - dit-test-network
+    profiles:
+      - load-test
+
+volumes:
+  postgres_test_data:
+    driver: local
+  prometheus_test_data:
+    driver: local
+  grafana_test_data:
+    driver: local
+  redis_test_data:
+    driver: local
+
+networks:
+  dit-test-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
