@@ -182,7 +182,7 @@ func (suite *TelemetryTestSuite) TestMetricsServer() {
 	require.NoError(suite.T(), err)
 	defer resp.Body.Close()
 	
-	assert.Equal(suite.T(), http.StatusOK, resp.Status Code)
+	assert.Equal(suite.T(), http.StatusOK, resp.StatusCode)
 	assert.Contains(suite.T(), resp.Header.Get("Content-Type"), "text/plain")
 	
 	// Test health endpoint
